@@ -51,7 +51,6 @@ class PushdownAutomata:
                     state = 'END'
                 else:
                     return False, structure
-        return True, structure
 
         # Check if the structure matches any of the valid patterns
         valid_patterns = [['S', 'P', 'O', 'K'], ['S', 'P', 'K'], ['S', 'P', 'O'], ['S', 'P']]

@@ -16,35 +16,41 @@ class PushdownAutomata:
         state = 'S'
         structure = []
 
+        print(tokens)
+
         for token in tokens:
             if state == 'S':
                 if self.s_recognizer.recognize(token):
-                    state = 'P'
                     structure.append('S')
+                    state = 'P'
                 else:
-                    return False
+                    return False, structure
             elif state == 'P':
                 if self.p_recognizer.recognize(token):
-                    state = 'O'
                     structure.append('P')
+                    state = 'O'
                 else:
-                    return False
+                    return False, structure
             elif state == 'O':
                 if self.o_recognizer.recognize(token):
-                    state = 'K'
                     structure.append('O')
+                    state = 'K'
                 else:
-                    state = 'END'
+                    if self.k_recognizer.recognize(token):
+                        structure.append('K')
+                        state = 'END'
+                    else:
+                        return False, structure
             elif state == 'K':
                 if self.k_recognizer.recognize(token):
-                    state = 'END'
                     structure.append('K')
-                else:
                     state = 'END'
+                else:
+                    return False, structure
 
         # Check if the structure matches any of the valid patterns
         valid_patterns = [['S', 'P', 'O', 'K'], ['S', 'P', 'K'], ['S', 'P', 'O'], ['S', 'P']]
-        return structure in valid_patterns
+        return structure in valid_patterns, structure
 
 # Define valid tokens
 subjek_tokens = ["saya", "kamu", "dia", "mereka", "kita"]
