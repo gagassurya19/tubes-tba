@@ -2,3 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+
+.emoji-button .emoji-content {
+    display: inline-block;
+    transition: all 0.3s ease;
+  }
+  
+  .emoji-button .emoji-content.default {
+    display: inline;
+  }
+  
+  .emoji-button .emoji-content.hover {
+    display: none;
+  }
+  
+  .emoji-button:hover .emoji-content.default {
+    display: none;
+  }
+  
+  .emoji-button:hover .emoji-content.hover {
+    display: inline;
+  }

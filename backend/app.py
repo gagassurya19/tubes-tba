@@ -57,7 +57,7 @@ class PushdownAutomata:
         return structure in valid_patterns, structure
 
 # Define valid tokens
-subjek_tokens = ["saya", "kamu", "dia", "mereka", "kita"]
+subjek_tokens = ["saya", "kamu", "dia", "mereka", "kita", "aku"]
 predikat_tokens = ["makan", "minum", "baca", "tulis", "lari"]
 objek_tokens = ["nasi", "air", "buku", "surat", "sepeda"]
 keterangan_tokens = ["dirumah", "disekolah", "dikantor", "dipasar", "ditaman"]
