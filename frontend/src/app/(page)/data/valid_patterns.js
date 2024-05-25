@@ -1,8 +1,34 @@
-"use client";
-import { useState } from "react";
+"use client"
+import React, { useEffect, useState } from 'react';
+import { useDataContext } from '../../utility/dataContext';
+import config from '../../json/config.json';
 
 export default function ValidPatterns() {
+  const { patterns, setPatterns } = useDataContext();
   const [addValidPatterns, setAddValidPatterns] = useState(false);
+  const isAddAble = config.isValidPatternAddAble;
+
+  useEffect(() => {
+    const storedPatterns = localStorage.getItem('valid_patterns');
+    if (storedPatterns) {
+      setPatterns(JSON.parse(storedPatterns));
+    } else {
+      setPatterns([
+        ['S', 'P', 'O', 'K'],
+        ['S', 'P', 'O'],
+        ['S', 'P', 'K'],
+        ['S', 'P'],
+      ]);
+    }
+  }, []);
+
+  const handleBlackList = (index) => {
+    const updatedPatterns = [...patterns];
+    updatedPatterns[index].isBlacklisted = !updatedPatterns[index].isBlacklisted;
+    setPatterns(updatedPatterns);
+    localStorage.setItem('valid_patterns', JSON.stringify(updatedPatterns));
+  };
+
   return (
     <div className="border dark:border-2 border-gray-400 dark:border-gray-700 w-full rounded-lg p-5">
       <p className="text-xl font-semibold border-b border-gray-400 dark:border-gray-700">
@@ -10,50 +36,24 @@ export default function ValidPatterns() {
       </p>
       <div className="my-3">
         <ol className="list-inside list-decimal font-semibold">
-          <li>
-            [ S - P - O - K ]
-            <button
-              type="button"
-              className="emoji-button max-w-5 max-h-5 justify-center ml-3"
-            >
-              <span className="emoji-content hover">❌</span>
-              <span className="emoji-content default">✅</span>
-            </button>
-          </li>
-          <li>
-            [ S - P - O ]{" "}
-            <button
-              type="button"
-              className="emoji-button max-w-5 max-h-5 justify-center ml-3"
-            >
-              <span className="emoji-content hover">❌</span>
-              <span className="emoji-content default">✅</span>
-            </button>
-          </li>
-          <li>
-            [ S - P - K ]{" "}
-            <button
-              type="button"
-              className="emoji-button max-w-5 max-h-5 justify-center ml-3"
-            >
-              <span className="emoji-content hover">❌</span>
-              <span className="emoji-content default">✅</span>
-            </button>
-          </li>
-          <li>
-            [ S - P ]{" "}
-            <button
-              type="button"
-              className="emoji-button max-w-5 max-h-5 justify-center ml-3"
-            >
-              <span className="emoji-content hover">❌</span>
-              <span className="emoji-content default">✅</span>
-            </button>
-          </li>
+          {patterns.map((pattern, index) => (
+            <li key={index}>
+              {pattern.join(' - ')}
+              <button
+                type="button"
+                className="emoji-button max-w-5 max-h-5 justify-center ml-3"
+                onClick={() => handleBlackList(index)}
+              >
+                <span className="emoji-content">
+                  {pattern.isBlacklisted ? '❌' : '✅'}
+                </span>
+              </button>
+            </li>
+          ))}
         </ol>
       </div>
-
-      {!addValidPatterns && (
+      
+      {!addValidPatterns && isAddAble && (
         <button
           type="button"
           className="inline-flex max-w-10 max-h-10 justify-center bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg px-3 py-2 font-extrabold"
@@ -62,7 +62,6 @@ export default function ValidPatterns() {
           +
         </button>
       )}
-
       {addValidPatterns && (
         <div className="border-t border-gray-400 dark:border-gray-700 mt-5">
           <label

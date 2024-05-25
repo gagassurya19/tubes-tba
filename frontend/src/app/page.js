@@ -1,10 +1,11 @@
 "use client";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { DataProvider } from "./utility/dataContext";
+
 import ValidPatterns from "./(page)/data/valid_patterns";
 import Tokens from "./(page)/data/tokens";
-import InputWord from "./(page)/result/input_word";
-import Result from "./(page)/result/result";
+import Result from "./(page)/result/page";
 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -22,21 +23,8 @@ export default function Home() {
   });
   if (!isLoaded) return "Loading...";
 
-  // const fetch = async () => {
-  //   try {
-  //     const response = await axios.get("http://localhost:8000/api")
-  //     console.log(response.data)
-  //   } catch (error) {
-  //     console.error(error)
-  //   }
-  // }
-
-  // useState(() => {
-  //   fetch()
-  // }, [])
-
   return (
-    <>
+    <DataProvider>
       <div className="flex flex-col items-center w-full">
         <div className="w-full max-w-5xl">
           <Header />
@@ -50,8 +38,7 @@ export default function Home() {
               <div className="flex-none w-full lg:w-56">
                 <ValidPatterns />
               </div>
-              <div className="flex flex-col gap-4 w-full lg:pl-4 lg:pb-4 lg:border-l border-gray-400 dark:border-gray-700">
-                <InputWord />
+              <div className="flex flex-col gap-4 w-full lg:pl-4 lg:border-l border-gray-400 dark:border-gray-700">
                 <Result />
               </div>
             </div>
@@ -61,6 +48,6 @@ export default function Home() {
           <Footer />
         </div>
       </div>
-    </>
+    </DataProvider>
   );
 }
