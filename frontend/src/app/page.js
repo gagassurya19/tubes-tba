@@ -37,20 +37,30 @@ export default function Home() {
 
   return (
     <>
-      <Header />
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col lg:flex-row gap-4 w-full">
-          <div className="flex-none w-full lg:w-56">
-            <ValidPatterns />
+      <div className="flex flex-col items-center w-full">
+        <div className="w-full max-w-5xl">
+          <Header />
+        </div>
+        <div className="flex flex-col gap-10 items-center w-full">
+          <div className="w-full max-w-screen-2xl">
+            <Tokens />
           </div>
-          <div className="flex flex-col gap-4 w-full lg:pl-4 lg:pb-4 lg:border-l lg:border-b border-gray-400 dark:border-gray-700">
-            <InputWord />
-            <Result />
+          <div className="w-full max-w-5xl">
+            <div className="flex flex-col lg:flex-row gap-4 w-full">
+              <div className="flex-none w-full lg:w-56">
+                <ValidPatterns />
+              </div>
+              <div className="flex flex-col gap-4 w-full lg:pl-4 lg:pb-4 lg:border-l border-gray-400 dark:border-gray-700">
+                <InputWord />
+                <Result />
+              </div>
+            </div>
           </div>
         </div>
-        <Tokens />
+        <div className="w-full max-w-5xl">
+          <Footer />
+        </div>
       </div>
-      <Footer />
     </>
   );
 }

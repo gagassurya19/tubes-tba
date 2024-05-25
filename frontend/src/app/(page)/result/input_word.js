@@ -13,7 +13,7 @@ export default function InputWord() {
             type="submit"
             className="text-white bg-gray-600 hover:bg-gray-500 dark:bg-sky-700 p-3 rounded-lg dark:hover:bg-sky-600 hover:cursor-pointer font-semibold text-center w-full sm:max-w-20"
           >
-            Submit
+            Check
           </button>
         </form>
       </div>
