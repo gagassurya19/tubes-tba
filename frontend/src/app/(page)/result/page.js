@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { useState } from "react";
 import { useDataContext } from "../../utility/dataContext";
 import { parseSentence } from "../../utility/algorithm";
@@ -6,7 +7,7 @@ import { parseSentence } from "../../utility/algorithm";
 export default function Result() {
   const [result, setResult] = useState(null);
   let { patterns } = useDataContext() || { patterns: [] };
-  
+
   // Filter patterns if needed
   patterns = patterns.filter((pattern) => !pattern.isBlacklisted);
 
@@ -37,20 +38,37 @@ export default function Result() {
           </button>
         </form>
       </div>
-      <div className="border dark:border-2 border-gray-400 dark:border-gray-700 w-full rounded-lg p-5">
-        <p className="text-xl font-semibold border-b border-gray-400 dark:border-gray-700">
-          RESULT
-        </p>
-        <div className="my-3">
-          {result && (
+      {result && (
+        <div className="border dark:border-2 border-gray-400 dark:border-gray-700 w-full rounded-lg p-5">
+          <p className="text-xl font-semibold border-b border-gray-400 dark:border-gray-700">
+            RESULT
+          </p>
+          <div className="my-3">
             <>
-              Kalimat: {result.sentence} <br/>
-              Struktur: {result.structure.join(" - ")} <br/>
-              Valid: {result.isValid ? "ya" : "tidak"} valid <br/>
+              Kalimat: {result.sentence} <br />
+              Struktur: {result.structure.join(" - ")} <br />
+              Valid: {result.isValid ? "YA" : "TIDAK"} <br />
+              <br />
+              <h1 className="font-extrabold">LOGS:</h1>
+              <ul>
+                {result.logs.map((log, index) => (
+                  <React.Fragment key={index}>
+                    <li>{log}</li>
+                    {log.includes("Isi stack") && <br />}
+                  </React.Fragment>
+                ))}
+              </ul>
             </>
-          )}
+          </div>
         </div>
-      </div>
+      )}
+      {!result && (
+        <div className="text-center mt-8 ">
+          Input kalimat sesuai pattern!
+          <br/>
+          [ Hasil akan muncul disini ]
+        </div> 
+      )}
     </>
   );
 }
