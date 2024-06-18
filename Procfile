@@ -1,1 +1,1 @@
-web: python generate_fa.py
+web: gunicorn -b :$PORT app:app

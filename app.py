@@ -1,83 +1,98 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, send_file, jsonify
+import graphviz
+import os
 
 app = Flask(__name__)
 
-class FiniteAutomata:
-    def __init__(self, valid_tokens):
-        self.valid_tokens = valid_tokens
+def generate_finite_automaton(nodes):
+    # Define the finite automaton
+    fa = graphviz.Digraph('finite_automaton', format='png')
+    fa.attr(rankdir='LR')  # Set the orientation to left-to-right
 
-    def recognize(self, word):
-        return word in self.valid_tokens
+    # S-P-O-K
+    if nodes.get('o', '') != '' and nodes.get('k', '') != '':
+        fa.node('q0', shape='circle', style='filled', fillcolor='yellow')
+        fa.node('s', shape='circle', style='filled', fillcolor='yellow')
+        fa.node('p', shape='doublecircle', style='filled', fillcolor='yellow')
+        fa.node('o', shape='doublecircle', style='filled', fillcolor='yellow')
+        fa.node('k', shape='doublecircle', style='filled', fillcolor='yellow')
 
-class PushdownAutomata:
-    def __init__(self, s_recognizer, p_recognizer, o_recognizer, k_recognizer):
-        self.s_recognizer = s_recognizer
-        self.p_recognizer = p_recognizer
-        self.o_recognizer = o_recognizer
-        self.k_recognizer = k_recognizer
+        fa.edge('q0', 's', label=nodes['s'])
+        fa.edge('s', 'p', label=nodes['p'])
+        fa.edge('p', 'o', label=nodes['o'])
+        fa.edge('o', 'k', label=nodes['k'])
 
-    def parse(self, tokens):
-        state = 'S'
-        structure = []
+    # S-P-O
+    elif nodes.get('o', '') != '' and nodes.get('k', '') == '':
+        fa.node('q0', shape='circle', style='filled', fillcolor='yellow')
+        fa.node('s', shape='circle', style='filled', fillcolor='yellow')
+        fa.node('p', shape='doublecircle', style='filled', fillcolor='yellow')
+        fa.node('o', shape='doublecircle', style='filled', fillcolor='yellow')
+        fa.node('k', shape='circle', style='filled', fillcolor='red', fontcolor='white')
 
-        print(tokens)
+        fa.edge('q0', 's', label=nodes['s'])
+        fa.edge('s', 'p', label=nodes['p'])
+        fa.edge('p', 'o', label=nodes['o'])
+        fa.edge('o', 'k')
 
-        for token in tokens:
-            if state == 'S':
-                if self.s_recognizer.recognize(token):
-                    structure.append('S')
-                    state = 'P'
-                else:
-                    return False, structure
-            elif state == 'P':
-                if self.p_recognizer.recognize(token):
-                    structure.append('P')
-                    state = 'O'
-                else:
-                    return False, structure
-            elif state == 'O':
-                if self.o_recognizer.recognize(token):
-                    structure.append('O')
-                    state = 'K'
-                else:
-                    if self.k_recognizer.recognize(token):
-                        structure.append('K')
-                        state = 'END'
-                    else:
-                        return False, structure
-            elif state == 'K':
-                if self.k_recognizer.recognize(token):
-                    structure.append('K')
-                    state = 'END'
-                else:
-                    return False, structure
+    # S-P-K
+    elif nodes.get('o', '') == '' and nodes.get('k', '') != '':
+        fa.node('q0', shape='circle', style='filled', fillcolor='yellow')
+        fa.node('s', shape='circle', style='filled', fillcolor='yellow')
+        fa.node('p', shape='doublecircle', style='filled', fillcolor='yellow')
+        fa.node('o', shape='circle', style='filled', fillcolor='red', fontcolor='white')
+        fa.node('k', shape='doublecircle', style='filled', fillcolor='yellow')
 
-        # Check if the structure matches any of the valid patterns
-        valid_patterns = [['S', 'P', 'O', 'K'], ['S', 'P', 'K'], ['S', 'P', 'O'], ['S', 'P']]
-        return structure in valid_patterns, structure
+        fa.edge('q0', 's', label=nodes['s'])
+        fa.edge('s', 'p', label=nodes['p'])
+        fa.edge('p', 'k', label=nodes['k'])
 
-# Define valid tokens
-subjek_tokens = ["saya", "kamu", "dia", "mereka", "kita", "aku"]
-predikat_tokens = ["makan", "minum", "baca", "tulis", "lari"]
-objek_tokens = ["nasi", "air", "buku", "surat", "sepeda"]
-keterangan_tokens = ["dirumah", "disekolah", "dikantor", "dipasar", "ditaman"]
+    # S-P
+    else:
+        fa.node('q0', shape='circle', style='filled', fillcolor='yellow')
+        fa.node('s', shape='circle', style='filled', fillcolor='yellow')
+        fa.node('p', shape='doublecircle', style='filled', fillcolor='yellow')
+        fa.node('o', shape='circle', style='filled', fillcolor='red', fontcolor='white')
+        fa.node('k', shape='circle', style='filled', fillcolor='red', fontcolor='white')
 
-# Initialize finite automata
-s_recognizer = FiniteAutomata(subjek_tokens)
-p_recognizer = FiniteAutomata(predikat_tokens)
-o_recognizer = FiniteAutomata(objek_tokens)
-k_recognizer = FiniteAutomata(keterangan_tokens)
+        fa.edge('q0', 's', label=nodes['s'])
+        fa.edge('s', 'p', label=nodes['p'])
 
-# Initialize pushdown automata
-parser = PushdownAutomata(s_recognizer, p_recognizer, o_recognizer, k_recognizer)
+    # Save and render the automaton
+    output_path = 'finite_automaton_custom'
+    fa.render(output_path)
 
-@app.route('/parse', methods=['POST'])
-def parse_sentence():
-    data = request.get_json()
+    # Return the image path
+    return f'{output_path}.png'
+
+@app.route('/generate-fa', methods=['POST'])
+def generate_fa_endpoint():
+    data = request.json
     sentence = data.get('sentence', '')
-    tokens = sentence.split()
-    data_parse = parser.parse(tokens)
-    return jsonify({'sentence': sentence, 'isValid': data_parse[0], 'structure': data_parse[1]})
+    structure = data.get('structure', [])
+    
+    if not sentence or not structure:
+        return jsonify({'error': 'Invalid input'}), 400
+    
+    words = sentence.split()
+    if len(words) != len(structure):
+        return jsonify({'error': 'Sentence and structure length mismatch'}), 400
+    
+    # Convert structure elements to lowercase
+    nodes = dict(zip([s.lower() for s in structure], words))
+    if 's' not in nodes or 'p' not in nodes:
+        return jsonify({'error': 'Structure must contain at least "s" and "p"'}), 400
+    
+    # Ensure keys for 'o' and 'k' exist in the nodes dictionary
+    nodes.setdefault('o', '')
+    nodes.setdefault('k', '')
+    
+    try:
+        image_path = generate_finite_automaton(nodes)
+        return send_file(image_path, mimetype='image/png')
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # app.run(host='0.0.0.0', port=8080) # local
+    app.run() # deploy
