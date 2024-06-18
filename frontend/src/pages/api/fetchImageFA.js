@@ -8,7 +8,7 @@ export default async function handler(req, res) {
       const { sentence, structure } = req.body;
 
       // Make the request to the Flask API
-      const flaskResponse = await axios.post('http://localhost:5000/generate-fa', {
+      const flaskResponse = await axios.post('http://blind-stephine-suryalab-6fb5178e.koyeb.app/generate-fa', {
         sentence,
         structure
       }, {
