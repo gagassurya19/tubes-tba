@@ -1,4 +1,4 @@
-import axios from 'axios';
+import fetch from 'node-fetch';
 import fs from 'fs';
 import path from 'path';
 
@@ -8,16 +8,24 @@ export default async function handler(req, res) {
       const { sentence, structure } = req.body;
 
       // Make the request to the Flask API
-      const flaskResponse = await axios.post('http://blind-stephine-suryalab-6fb5178e.koyeb.app/generate-fa', {
-        sentence,
-        structure
-      }, {
-        responseType: 'arraybuffer' // Ensure we get the binary data
+      const flaskResponse = await fetch('http://blind-stephine-suryalab-6fb5178e.koyeb.app/generate-fa', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ sentence, structure })
       });
+
+      if (!flaskResponse.ok) {
+        throw new Error(`Flask API error: ${flaskResponse.statusText}`);
+      }
+
+      // Ensure we get the binary data
+      const buffer = await flaskResponse.buffer();
 
       // Save the image to a temporary location
       const imagePath = path.join(process.cwd(), 'public', 'finite_automaton.png');
-      fs.writeFileSync(imagePath, flaskResponse.data);
+      fs.writeFileSync(imagePath, buffer);
 
       // Return the path to the image
       res.status(200).json({ imagePath: '/finite_automaton.png' });
