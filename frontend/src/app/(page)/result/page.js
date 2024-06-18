@@ -6,7 +6,7 @@ import config from "../../json/config.json";
 
 export default function Result() {
   const [result, setResult] = useState(null);
-  const [imagePath, setImagePath] = useState('');
+  const [imageData, setImageData] = useState('');
   let { patterns } = useDataContext() || { patterns: [] };
 
   // Filter patterns if needed
@@ -19,7 +19,7 @@ export default function Result() {
     setResult(parseResult);
 
     if (!parseResult.isValid || config.disableGenerateFA) {
-      setImagePath('');
+      setImageData('');
       return;
     }
 
@@ -34,9 +34,8 @@ export default function Result() {
       });
 
       const data = await response.json();
-      if (data.imagePath) {
-        const timestamp = new Date().getTime();
-        setImagePath(`${data.imagePath}?timestamp=${timestamp}`);
+      if (data.image) {
+        setImageData(data.image);
       } else {
         alert('Failed to generate image');
       }
@@ -89,10 +88,10 @@ export default function Result() {
               </ul>
             </>
           </div>
-          {imagePath && (
+          {imageData && (
             <div className="my-3">
               <h2 className="text-xl font-semibold">Generated Image:</h2>
-              <img src={imagePath} alt="Finite Automaton" />
+              <img src={imageData} alt="Finite Automaton" />
             </div>
           )}
         </div>

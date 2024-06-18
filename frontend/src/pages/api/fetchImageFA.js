@@ -1,6 +1,4 @@
 import fetch from 'node-fetch';
-import fs from 'fs';
-import path from 'path';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
@@ -23,12 +21,12 @@ export default async function handler(req, res) {
       // Ensure we get the binary data
       const buffer = await flaskResponse.buffer();
 
-      // Save the image to a temporary location
-      const imagePath = path.join(process.cwd(), 'public', 'finite_automaton.png');
-      fs.writeFileSync(imagePath, buffer);
+      // Convert the buffer to a Base64 string
+      const base64Image = buffer.toString('base64');
+      const mimeType = flaskResponse.headers.get('content-type');
 
-      // Return the path to the image
-      res.status(200).json({ imagePath: '/finite_automaton.png' });
+      // Return the Base64 encoded image
+      res.status(200).json({ image: `data:${mimeType};base64,${base64Image}` });
     } catch (error) {
       console.error('Error generating image:', error);
       res.status(500).json({ error: 'Failed to generate image' });
