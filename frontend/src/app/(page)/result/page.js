@@ -1,27 +1,56 @@
 "use client";
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useDataContext } from "../../utility/dataContext";
 import { parseSentence } from "../../utility/algorithm";
+import config from "../../json/config.json";
 
 export default function Result() {
   const [result, setResult] = useState(null);
+  const [imagePath, setImagePath] = useState('');
   let { patterns } = useDataContext() || { patterns: [] };
 
   // Filter patterns if needed
   patterns = patterns.filter((pattern) => !pattern.isBlacklisted);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const parseResult = parseSentence(e.target[0].value, patterns);
+    const inputText = e.target[0].value;
+    const parseResult = parseSentence(inputText, patterns);
     setResult(parseResult);
+
+    if (!parseResult.isValid || config.disableGenerateFA) {
+      setImagePath('');
+      return;
+    }
+
+    // Make a request to the Flask API to generate the image
+    try {
+      const response = await fetch('/api/fetchImageFA', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ sentence: inputText, structure: parseResult.structure }),
+      });
+
+      const data = await response.json();
+      if (data.imagePath) {
+        const timestamp = new Date().getTime();
+        setImagePath(`${data.imagePath}?timestamp=${timestamp}`);
+      } else {
+        alert('Failed to generate image');
+      }
+    } catch (error) {
+      console.error('Error fetching image:', error);
+      alert('Error fetching image');
+    }
   };
 
   return (
     <>
       <div className="flex flex-col">
         <form
-          onSubmit={(e) => handleSubmit(e)}
+          onSubmit={handleSubmit}
           className="flex flex-col sm:flex-row gap-2 w-full"
         >
           <input
@@ -60,14 +89,20 @@ export default function Result() {
               </ul>
             </>
           </div>
+          {imagePath && (
+            <div className="my-3">
+              <h2 className="text-xl font-semibold">Generated Image:</h2>
+              <img src={imagePath} alt="Finite Automaton" />
+            </div>
+          )}
         </div>
       )}
       {!result && (
-        <div className="text-center mt-8 ">
+        <div className="text-center mt-8">
           Input kalimat sesuai pattern!
-          <br/>
+          <br />
           [ Hasil akan muncul disini ]
-        </div> 
+        </div>
       )}
     </>
   );

@@ -1,4 +1,5 @@
 {
     "isTokenAddAble": false,
-    "isValidPatternAddAble": false
+    "isValidPatternAddAble": false,
+    "disableGenerateFA": false
 }
