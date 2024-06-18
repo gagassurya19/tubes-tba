@@ -1,8 +1,10 @@
 from flask import Flask, request, send_file, jsonify
+from flask_cors import CORS
 import graphviz
 import os
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
 def generate_finite_automaton(nodes):
     # Define the finite automaton
