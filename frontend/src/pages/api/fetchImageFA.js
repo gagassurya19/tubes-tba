@@ -8,7 +8,7 @@ export default async function handler(req, res) {
       const { sentence, structure } = req.body;
 
       // Make the request to the Flask API
-      const flaskResponse = await fetch('http://blind-stephine-suryalab-6fb5178e.koyeb.app/generate-fa', {
+      const flaskResponse = await fetch('https://unhappy-kaitlyn-suryalab-7e694481.koyeb.app/generate-fa', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
