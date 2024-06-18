@@ -90,7 +90,7 @@ export default function Result() {
           </div>
           {imageData && (
             <div className="my-3">
-              <h2 className="text-xl font-semibold">Generated Image:</h2>
+              <h2 className="text-xl font-semibold">DIAGRAM FINITE AUTOMATA:</h2>
               <img src={imageData} alt="Finite Automaton" />
             </div>
           )}
