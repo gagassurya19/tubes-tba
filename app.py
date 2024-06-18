@@ -25,7 +25,7 @@ def generate_finite_automaton(nodes):
         fa.edge('o', 'k', label=nodes['k'])
 
     # S-P-O
-    elif nodes.get('o', '') != '' and nodes.get('k', '') == '':
+    if nodes.get('o', '') != '' and nodes.get('k', '') == '':
         fa.node('q0', shape='circle', style='filled', fillcolor='yellow')
         fa.node('s', shape='circle', style='filled', fillcolor='yellow')
         fa.node('p', shape='doublecircle', style='filled', fillcolor='yellow')
@@ -36,9 +36,10 @@ def generate_finite_automaton(nodes):
         fa.edge('s', 'p', label=nodes['p'])
         fa.edge('p', 'o', label=nodes['o'])
         fa.edge('o', 'k')
+        fa.edge('p', 'k')
 
     # S-P-K
-    elif nodes.get('o', '') == '' and nodes.get('k', '') != '':
+    if nodes.get('o', '') == '' and nodes.get('k', '') != '':
         fa.node('q0', shape='circle', style='filled', fillcolor='yellow')
         fa.node('s', shape='circle', style='filled', fillcolor='yellow')
         fa.node('p', shape='doublecircle', style='filled', fillcolor='yellow')
@@ -47,10 +48,12 @@ def generate_finite_automaton(nodes):
 
         fa.edge('q0', 's', label=nodes['s'])
         fa.edge('s', 'p', label=nodes['p'])
+        fa.edge('p', 'o')
+        fa.edge('o', 'k')
         fa.edge('p', 'k', label=nodes['k'])
 
     # S-P
-    else:
+    if nodes.get('o', '') == '' and nodes.get('k', '') == '':
         fa.node('q0', shape='circle', style='filled', fillcolor='yellow')
         fa.node('s', shape='circle', style='filled', fillcolor='yellow')
         fa.node('p', shape='doublecircle', style='filled', fillcolor='yellow')
@@ -59,6 +62,9 @@ def generate_finite_automaton(nodes):
 
         fa.edge('q0', 's', label=nodes['s'])
         fa.edge('s', 'p', label=nodes['p'])
+        fa.edge('p', 'o')
+        fa.edge('o', 'k')
+        fa.edge('p', 'k')
 
     # Save and render the automaton
     output_path = 'finite_automaton_custom'
